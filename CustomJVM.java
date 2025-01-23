@@ -11,11 +11,12 @@ public class CustomJVM {
 
         try {
             ClassFile classFile = ClassFile.parse(classFileName);
-            System.out.println(classFile);
+            System.out.println("Parsed Class File: " + classFile);
 
+            System.out.println("\nRunning hardcoded bytecode demonstration...");
             byte[] bytecode = {
                     0x10, 0x05,
-                    0x10, 0x03,
+                    0x10, 0x04,
                     0x60,
                     (byte) 0xB1
             };
@@ -23,7 +24,9 @@ public class CustomJVM {
             BytecodeInterpreter interpreter = new BytecodeInterpreter();
             interpreter.execute(bytecode);
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Error reading class file: " + e.getMessage());
+        } catch (IllegalArgumentException e) {
+            System.out.println("Invalid class file: " + e.getMessage());
         }
     }
 }

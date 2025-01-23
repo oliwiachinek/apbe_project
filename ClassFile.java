@@ -18,25 +18,35 @@ public class ClassFile {
             for (int i = 1; i < constantPoolCount; i++) {
                 int tag = dis.readUnsignedByte();
                 switch (tag) {
-                    case 7:
-                    case 8:
+                    case 0: // Unused entry, skip
+                        break;
+                    case 7:  // CONSTANT_Class
+                    case 8:  // CONSTANT_String
+                        dis.readUnsignedShort(); // Single index
+                        break;
+                    case 10: // CONSTANT_Methodref
+                    case 11: // CONSTANT_InterfaceMethodref
+                    case 12: // CONSTANT_NameAndType
+                        dis.readUnsignedShort(); // Two indices
                         dis.readUnsignedShort();
                         break;
-                    case 3:
-                    case 4:
-                        dis.readInt();
+                    case 3:  // CONSTANT_Integer
+                    case 4:  // CONSTANT_Float
+                        dis.readInt(); // Skip 4 bytes
                         break;
-                    case 5:
-                    case 6:
-                        dis.readLong();
-                        i++;
+                    case 5:  // CONSTANT_Long
+                    case 6:  // CONSTANT_Double
+                        dis.readLong(); // Skip 8 bytes
+                        i++; // Takes up two entries
                         break;
-                    case 1:
+                    case 1:  // CONSTANT_Utf8
                         int length = dis.readUnsignedShort();
-                        dis.skipBytes(length);
+                        dis.skipBytes(length); // Skip the UTF-8 string
                         break;
                     default:
-                        throw new IllegalArgumentException("Unsupported constant pool tag: " + tag);
+                        System.err.println("Warning: Unsupported constant pool tag " + tag + ". Skipping...");
+                        // Skip unknown tags (gracefully continue parsing)
+                        break;
                 }
             }
 
